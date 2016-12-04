@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +14,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
+import static android.content.ContentValues.TAG;
+
 /**
- * Created by rana_ on 12/3/2016.
+ * Rememeber, a fragmenet is a "replaceable activity" and allows for the separation of concerns...
+ * I am a bit lots as to why we need and "activity" and a "Fragement"... why not just one activity and
+ * then replace the Fragments??
  */
 
 public class CrimeFragment extends Fragment {
@@ -36,9 +45,9 @@ public class CrimeFragment extends Fragment {
     it is hosted right there which is why you can complete the inflation in the onCreate method.
      */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup conatiner, Bundle savedInstanceState){
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         //We pass in false here since the we will ad the view in the activity's code
-        View v = inflater.inflate(R.layout.fragment_crime, conatiner, false);
+        View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
         //We need to use the V here to get the ID, as we inflated it on our own.
         mTitleField = (EditText)v.findViewById(R.id.crime_title);
@@ -63,7 +72,11 @@ public class CrimeFragment extends Fragment {
 
         //Set the date of the button to the crime's date, and disable it
         mDateButton = (Button)v.findViewById(R.id.crime_date);
-        mDateButton.setText(mCrime.getDateOccoured().toString());
+
+        DateFormat df = new android.text.format.DateFormat();
+        Log.d(TAG, "onCreateView: My date is [" + df.format("E, MM, dd,yyyy", mCrime.getDateOccoured())+']');
+
+        mDateButton.setText(df.format("E, MM, dd,yyyy", mCrime.getDateOccoured()));
         mDateButton.setEnabled(false);
 
 

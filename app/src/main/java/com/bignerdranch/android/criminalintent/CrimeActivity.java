@@ -1,33 +1,18 @@
 package com.bignerdranch.android.criminalintent;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 
-
-public class CrimeActivity extends FragmentActivity {
+/*
+So we have created a new abstract parent class which will allow us to leverage fragments in a much
+easier fashion. All we need to do is ensure that we create an instance of the right one, and it will
+add it will create all of the appropriate methods to implment it properly. (i.e onCreate, add the
+new fragment to the manager... etc, etc.. (Saves a lot of typing)
+ */
+public class CrimeActivity extends SingleFragmentActivity{
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_crime);
-
-        //Since we are using the support fragment library, we call getSUPPORTFragmentManager.. tricky
-        FragmentManager fm = getSupportFragmentManager();
-
-        //We know that our fragment is going to be put in this container
-        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
-
-        //So if the container is null, we know we need to make it
-        if (fragment == null){
-            //make the fragment
-            fragment = new CrimeFragment();
-            //add it to the container.... like a boss!
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit();
-        }
+   protected Fragment createFragment(){
+        return new CrimeFragment();
     }
 
 
