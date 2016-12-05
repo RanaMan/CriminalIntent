@@ -16,6 +16,7 @@ import android.widget.EditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
 
@@ -27,15 +28,37 @@ import static android.content.ContentValues.TAG;
 
 public class CrimeFragment extends Fragment {
 
+    //This is for our bundle
+    private static final String ARG_CRIME_ID = "crime_id";
+
     private Crime       mCrime;
     private EditText    mTitleField;
     private Button      mDateButton;
     private CheckBox    mSolvedCheckBox;
 
+    public static CrimeFragment newInstance(UUID crimeID){
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_CRIME_ID, crimeID);
+
+        CrimeFragment fragment = new CrimeFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
+    /* This is the stardard "start method" */
     @Override
     public void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        mCrime = new Crime();
+        UUID crimeID = (UUID)getArguments().getSerializable(ARG_CRIME_ID);
+
+        /*
+        The Crimelab is static so you can leverage that call. (The method is also static). We are
+         going to use arguements in a bundle next...
+         */
+
+        mCrime = CrimeLab.get(getActivity()).getCrime(crimeID);
+
     }
 
 
@@ -51,6 +74,7 @@ public class CrimeFragment extends Fragment {
 
         //We need to use the V here to get the ID, as we inflated it on our own.
         mTitleField = (EditText)v.findViewById(R.id.crime_title);
+        mTitleField.setText(mCrime.getTitle());
 
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -83,6 +107,7 @@ public class CrimeFragment extends Fragment {
         //When the box is set, update the value within the crime object. (Of course we need to set
         //it when we load a crime, but I am sure we will get to that.
         mSolvedCheckBox = (CheckBox)v.findViewById(R.id.crime_solved);
+        mSolvedCheckBox.setChecked(mCrime.isSolved());
         mSolvedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

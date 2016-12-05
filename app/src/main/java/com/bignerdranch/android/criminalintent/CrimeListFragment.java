@@ -1,5 +1,6 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,12 +45,31 @@ public class CrimeListFragment extends Fragment {
     }
 
 
+    /*
+    This is what is called when the view regains visibiliy.
+     */
+    @Override
+    public void onResume(){
+        super.onResume();
+        updateUI();
+    }
+
+    /*
+    This is done to ensure that the model is bound to the UI properly. (You do this when you start
+    and when you pop back to this fragment to ensure any changes have been applied.
+     */
     private void updateUI(){
         CrimeLab crimeLab = CrimeLab.get(getActivity());
-
         List<Crime> crimes = crimeLab.getCrimes();
-        mAdapter = new CrimeAdapter(crimes);
-        mCrimeRecyclerView.setAdapter(mAdapter);
+
+        if(mAdapter == null){
+            //If the adapter is null, then it is brand new... just get the data...
+            mAdapter = new CrimeAdapter(crimes);
+            mCrimeRecyclerView.setAdapter(mAdapter);
+        }else{
+            //Otherwise, run the notificatier that data has/may have changed
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     /*
@@ -58,6 +78,7 @@ public class CrimeListFragment extends Fragment {
      */
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
+        //TODO: how is is clear that mCrime has the context of the item which we are looking for?
         private Crime mCrime;
 
         public TextView mTitleTextView;
@@ -79,19 +100,24 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View v){
-            Toast.makeText(getActivity(),mCrime.getTitle() + " Clicked!" ,Toast.LENGTH_SHORT)
-                    .show();
+            //Not going to show a toast, going to invoke the intent
+            Intent intent = CrimeActivity.newIntent(getActivity(),mCrime.getId());
+            startActivity(intent);
         }
 
         /*
         Utility class for the binding...
          */
         public void bindCrime(Crime crime){
+
             mCrime = crime;
             mTitleTextView.setText(mCrime.getTitle());
             mDateTextView.setText(mCrime.getDateOccoured().toString());
             mSolvedCheckBox.setChecked(mCrime.isSolved());
         }
+
+
+
     }
 
     /*
@@ -138,7 +164,6 @@ public class CrimeListFragment extends Fragment {
             //We put this back in the holder since the actual elements are there...
             holder.bindCrime(crime);
         }
-
 
         /*
         Ccount! Good stuff.
